@@ -165,10 +165,6 @@ router.put('/edit-item', (req, res, next) => {
 });
 
 router.delete('/delete-item', (req, res, next) => {
-
-
-  const book = req.body.id;
-  console.log(book);
 });
 
 module.exports = router;
