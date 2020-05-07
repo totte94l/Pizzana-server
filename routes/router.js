@@ -8,6 +8,11 @@ const jwt = require('jsonwebtoken');
 const db = require('../lib/db.js');
 const userMiddleware = require('../middleware/users.js');
 
+/*
+  Postman Header
+  Content-Type - application/json
+*/
+
 router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
     db.query(
         `SELECT * FROM users WHERE LOWER(username) = LOWER(${db.escape(
@@ -107,6 +112,63 @@ router.post('/login', (req, res, next) => {
 
 router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
   res.send('This is the secret content. Only logged in users can see that!');
+});
+
+router.get('/menu-items', (req, res, next) => {
+  db.query(`SELECT * FROM menuitems`,
+    (err, result) => {
+      // user does not exists
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          msg: err
+        });
+      }
+      if (!result.length) {
+        return res.status(401).send({
+          msg: 'Fel'
+        });
+      }
+
+      else {
+        return res.status(200).send({
+          msg: 'success',
+          menu: result
+        });
+      }
+    }
+  );
+});
+
+router.put('/edit-item', (req, res, next) => {
+  db.query(
+    `UPDATE 
+      menuitems 
+    SET 
+      name = ${db.escape(req.body.name)},
+      ingredients = ${db.escape(req.body.ingredients)}
+    WHERE 
+      id = ${db.escape(req.body.id)} `,
+    function(err, results) {
+      if( err ) {
+        console.log("Error")
+        return res.status(400).send({
+          msg: err
+        });
+      } else {
+        return res.status(200).send({
+          msg: "Uppdatering sparad"
+        });
+      }
+    }
+  )
+});
+
+router.delete('/delete-item', (req, res, next) => {
+
+
+  const book = req.body.id;
+  console.log(book);
 });
 
 module.exports = router;
