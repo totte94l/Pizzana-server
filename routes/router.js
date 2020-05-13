@@ -124,12 +124,6 @@ router.get('/menu-items', (req, res, next) => {
           msg: err
         });
       }
-      if (!result.length) {
-        return res.status(401).send({
-          msg: 'Fel'
-        });
-      }
-
       else {
         return res.status(200).send({
           msg: 'success',
@@ -146,7 +140,8 @@ router.put('/edit-item', (req, res, next) => {
       menuitems 
     SET 
       name = ${db.escape(req.body.name)},
-      ingredients = ${db.escape(req.body.ingredients)}
+      ingredients = ${db.escape(req.body.ingredients)},
+      price = ${db.escape(req.body.price)}
     WHERE 
       id = ${db.escape(req.body.id)} `,
     function(err, results) {
@@ -165,6 +160,43 @@ router.put('/edit-item', (req, res, next) => {
 });
 
 router.delete('/delete-item', (req, res, next) => {
+  console.log("Körs: ", req.body.data.id )
+  db.query(`
+    DELETE FROM menuitems WHERE id=${db.escape(req.body.data.id)}
+  `, function(err, result) {
+    if( err ) {
+      return res.status(500).send({
+        msg: 'Error'
+      });
+    }
+
+    return res.status(200).send({
+      msg: 'Menu item deleted!'
+    });
+  })
 });
+
+router.post('/add-item', (req, res, next) => {
+  db.query(
+    `INSERT INTO 
+      menuitems (name, ingredients, category, glutenFree, lactoseFree, price)
+    VALUES
+     (${db.escape(req.body.data.name)},
+      ${db.escape(req.body.data.ingredients)},
+      ${db.escape(req.body.data.category)},
+      ${db.escape(req.body.data.glutenFree)},
+      ${db.escape(req.body.data.lactoseFree)},
+      ${db.escape(req.body.data.price)})`, function(err, result) {
+        if( err ) {
+          return res.status(500).send({
+            msg: 'Error'
+          });
+        }
+    
+        return res.status(200).send({
+          msg: 'Menu item added!'
+        });
+      })
+    });
 
 module.exports = router;
