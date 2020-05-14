@@ -160,7 +160,7 @@ router.put('/edit-item', (req, res, next) => {
 });
 
 router.delete('/delete-item', (req, res, next) => {
-  console.log("Körs: ", req.body.data.id )
+  console.log("Körs: ", req.body.data )
   db.query(`
     DELETE FROM menuitems WHERE id=${db.escape(req.body.data.id)}
   `, function(err, result) {
@@ -177,16 +177,17 @@ router.delete('/delete-item', (req, res, next) => {
 });
 
 router.post('/add-item', (req, res, next) => {
+  console.log(req.body.data.data.name)
   db.query(
     `INSERT INTO 
       menuitems (name, ingredients, category, glutenFree, lactoseFree, price)
     VALUES
-     (${db.escape(req.body.data.name)},
-      ${db.escape(req.body.data.ingredients)},
-      ${db.escape(req.body.data.category)},
-      ${db.escape(req.body.data.glutenFree)},
-      ${db.escape(req.body.data.lactoseFree)},
-      ${db.escape(req.body.data.price)})`, function(err, result) {
+     (${db.escape(req.body.data.data.name)},
+      ${db.escape(req.body.data.data.ingredients)},
+      ${db.escape(req.body.data.data.category)},
+      ${db.escape(req.body.data.data.glutenFree)},
+      ${db.escape(req.body.data.data.lactoseFree)},
+      ${db.escape(req.body.data.data.price)})`, function(err, result) {
         if( err ) {
           return res.status(500).send({
             msg: 'Error'
