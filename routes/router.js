@@ -135,6 +135,7 @@ router.get('/menu-items', (req, res, next) => {
 });
 
 router.put('/edit-item', (req, res, next) => {
+  console.log(req.body.name)
   db.query(
     `UPDATE 
       menuitems 
