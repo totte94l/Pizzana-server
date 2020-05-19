@@ -4,13 +4,13 @@
           // username min length 3
           if (!req.body.username || req.body.username.length < 3) {
             return res.status(400).send({
-              msg: 'Please enter a username with min. 3 chars'
+              msg: 'Ditt användarnamn måste bestå av minst tre tecken.'
             });
           }
           // password min 6 chars
           if (!req.body.password || req.body.password.length < 6) {
             return res.status(400).send({
-              msg: 'Please enter a password with min. 6 chars'
+              msg: 'Ditt lösenord får inte vara kortare än sex tecken.'
             });
           }
           // password (repeat) does not match
@@ -19,7 +19,7 @@
             req.body.password != req.body.password_repeat
           ) {
             return res.status(400).send({
-              msg: 'Both passwords must match'
+              msg: 'Lösenorden matchar inte.'
             });
           }
           next();
