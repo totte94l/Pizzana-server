@@ -21,7 +21,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
         (err, result) => {
           if (result.length) {
             return res.status(409).send({
-              msg: 'This username is already in use!'
+              msg: 'Användarnamnet är upptaget, försök igen!'
             });
           } else {
             // username is available
@@ -44,7 +44,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                       });
                     }
                     return res.status(201).send({
-                      msg: 'Registered!'
+                      msg: 'Konto skapat!'
                     });
                   }
                 );
@@ -142,7 +142,9 @@ router.put('/edit-item', (req, res, next) => {
     SET 
       name = ${db.escape(req.body.name)},
       ingredients = ${db.escape(req.body.ingredients)},
-      price = ${db.escape(req.body.price)}
+      price = ${db.escape(req.body.price)},
+      glutenFree = ${db.escape(req.body.glutenFree)},
+      lactoseFree = ${db.escape(req.body.lactoseFree)}
     WHERE 
       id = ${db.escape(req.body.id)} `,
     function(err, results) {
@@ -172,7 +174,7 @@ router.delete('/delete-item', (req, res, next) => {
     }
 
     return res.status(200).send({
-      msg: 'Menu item deleted!'
+      msg: 'Rätt borttagen!'
     });
   })
 });
@@ -191,12 +193,14 @@ router.post('/add-item', (req, res, next) => {
       ${db.escape(req.body.data.data.price)})`, function(err, result) {
         if( err ) {
           return res.status(500).send({
-            msg: 'Error'
+            success: 'false',
+            msg: 'Fel! Kunde inte lägga till rätt'
           });
         }
     
         return res.status(200).send({
-          msg: 'Menu item added!'
+          success: 'true',
+          msg: 'Rätten tillagd i menyn'
         });
       })
     });
