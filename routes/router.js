@@ -191,18 +191,68 @@ router.post('/add-item', (req, res, next) => {
       ${db.escape(req.body.data.data.glutenFree)},
       ${db.escape(req.body.data.data.lactoseFree)},
       ${db.escape(req.body.data.data.price)})`, function(err, result) {
-        if( err ) {
-          return res.status(500).send({
-            success: 'false',
-            msg: 'Fel! Kunde inte lägga till rätt'
-          });
-        }
-    
-        return res.status(200).send({
-          success: 'true',
-          msg: 'Rätten tillagd i menyn'
+
+      if( err ) {
+        return res.status(500).send({
+          success: 'false',
+          msg: 'Fel! Kunde inte lägga till rätt'
         });
-      })
-    });
+      }
+  
+      return res.status(200).send({
+        success: 'true',
+        msg: 'Rätten tillagd i menyn'
+      });
+    })
+});
+
+router.get('/restaurant-info', (req, res, next) => {
+  db.query(`SELECT * FROM restaurant_info WHERE id = 1`,
+    (err, result) => {
+      // user does not exists
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          msg: err
+        });
+      }
+      else {
+        return res.status(200).send({
+          msg: 'success',
+          info: result
+        });
+      }
+    }
+  );
+});
+
+router.put('/edit-about', (req, res, next) => {
+  console.log(req.body.openHours)
+  db.query(
+    `UPDATE 
+      restaurant_info
+    SET 
+      name = ${db.escape(req.body.name)},
+      description = ${db.escape(req.body.description)},
+      address = ${db.escape(req.body.address)},
+      open_hours = ${db.escape(req.body.openHours)},
+      phone = ${db.escape(req.body.phone)}
+    WHERE 
+      id = 1`,
+    function(err, results) {
+      if( err ) {
+        console.log("Error")
+        return res.status(400).send({
+          msg: err
+        });
+      } else {
+        return res.status(200).send({
+          msg: "Uppdatering sparad"
+        });
+      }
+    }
+  )
+});
+
 
 module.exports = router;
