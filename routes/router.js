@@ -308,5 +308,35 @@ router.put('/edit-about', (req, res, next) => {
   )
 });
 
+router.post('/public-menu', (req, res, next) => {
+  console.log(req.body.routeName)
+  db.query(`SELECT owner FROM restaurants WHERE route_name = ${db.escape(req.body.routeName)}`,
+    (err, result) => {
+      // user does not exists
+      if (err) {
+        console.log(err)
+        return res.status(400).send({
+          msg: err
+        });
+      } else {
+        console.log(result[0].owner);
+        db.query(`
+          SELECT
+          *
+          FROM 
+            menuitems
+          WHERE
+            owner = ${result[0].owner} `,
+
+          (err, result) => {
+          return res.status(200).send({
+            msg: err,
+            menu: result
+          });
+        })
+      }
+    }
+  );
+});
 
 module.exports = router;
