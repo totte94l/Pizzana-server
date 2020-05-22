@@ -115,6 +115,56 @@ router.post('/login', (req, res, next) => {
     );
 });
 
+router.put('/change-password', (req, res, next) => {
+  console.log(req.body.username)
+  db.query(
+    `SELECT * FROM users WHERE username = ${db.escape(req.body.username)};`,
+    (err, result) => {
+      // user does not exists
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          msg: err
+        });
+      }
+      if (!result.length) {
+        return res.status(401).send({
+          msg: 'Fel uppstod 112'
+        });
+      }
+      // check password
+      bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) {
+          return res.status(500).send({
+            msg: er
+          });
+        } else {
+          // has hashed pw => add to database
+          db.query(
+            `UPDATE
+              users 
+            SET
+              password = ${db.escape(hash)}
+            WHERE
+              username = '${result[0].username}'`,
+            (err, result) => {
+              if (err) {
+                throw err;
+                return res.status(400).send({
+                  msg: err
+                });
+              }
+              return res.status(200).send({
+                msg: 'Lösenordet uppdaterat!'
+              });
+            }
+          );
+        }
+      });
+    }
+  );
+})
+
 router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
   res.send('This is the secret content. Only logged in users can see that!');
 });
