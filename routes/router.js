@@ -32,8 +32,9 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                 });
               } else {
                 // has hashed pw => add to database
+                const uuidv = uuid.v4()
                 db.query(
-                  `INSERT INTO users (id, username, password, registered) VALUES ('${uuid.v4()}', ${db.escape(
+                  `INSERT INTO users (id, username, password, registered) VALUES ('${uuidv}', ${db.escape(
                     req.body.username
                   )}, ${db.escape(hash)}, now())`,
                   (err, result) => {
@@ -43,6 +44,10 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                         msg: err
                       });
                     }
+
+                    db.query(
+                      `INSERT INTO restaurants (owner) VALUES ('${uuidv}')`)
+
                     return res.status(201).send({
                       msg: 'Konto skapat!'
                     });
@@ -115,6 +120,7 @@ router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
 });
 
 router.post('/menu-items', (req, res, next) => {
+  console.log(req.body.id)
   db.query(`SELECT * FROM menuitems WHERE owner = ${db.escape(req.body.id)}`,
     (err, result) => {
       // user does not exists
