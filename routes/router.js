@@ -32,8 +32,9 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                 });
               } else {
                 // has hashed pw => add to database
+                const uuidv = uuid.v4()
                 db.query(
-                  `INSERT INTO users (id, username, password, registered) VALUES ('${uuid.v4()}', ${db.escape(
+                  `INSERT INTO users (id, username, password, registered) VALUES ('${uuidv}', ${db.escape(
                     req.body.username
                   )}, ${db.escape(hash)}, now())`,
                   (err, result) => {
@@ -43,6 +44,10 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                         msg: err
                       });
                     }
+
+                    db.query(
+                      `INSERT INTO restaurants (owner) VALUES ('${uuidv}')`)
+
                     return res.status(201).send({
                       msg: 'Konto skapat!'
                     });
@@ -115,6 +120,7 @@ router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
 });
 
 router.post('/menu-items', (req, res, next) => {
+  console.log(req.body.id)
   db.query(`SELECT * FROM menuitems WHERE owner = ${db.escape(req.body.id)}`,
     (err, result) => {
       // user does not exists
@@ -228,7 +234,7 @@ router.post('/restaurant-info', (req, res, next) => {
 router.put('/edit-about', (req, res, next) => {
   db.query(
     `UPDATE 
-      restaurant_info
+      restaurants
     SET 
       name = ${db.escape(req.body.name)},
       description = ${db.escape(req.body.description)},
@@ -236,7 +242,7 @@ router.put('/edit-about', (req, res, next) => {
       open_hours = ${db.escape(req.body.openHours)},
       phone = ${db.escape(req.body.phone)}
     WHERE 
-      id = 1`,
+      owner = ${db.escape(req.body.owner)}`,
     function(err, results) {
       if( err ) {
         console.log("Error")
