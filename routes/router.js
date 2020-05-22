@@ -234,7 +234,7 @@ router.post('/restaurant-info', (req, res, next) => {
 router.put('/edit-about', (req, res, next) => {
   db.query(
     `UPDATE 
-      restaurant_info
+      restaurants
     SET 
       name = ${db.escape(req.body.name)},
       description = ${db.escape(req.body.description)},
@@ -242,7 +242,7 @@ router.put('/edit-about', (req, res, next) => {
       open_hours = ${db.escape(req.body.openHours)},
       phone = ${db.escape(req.body.phone)}
     WHERE 
-      id = 1`,
+      owner = ${db.escape(req.body.owner)}`,
     function(err, results) {
       if( err ) {
         console.log("Error")
