@@ -114,8 +114,8 @@ router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
   res.send('This is the secret content. Only logged in users can see that!');
 });
 
-router.get('/menu-items', (req, res, next) => {
-  db.query(`SELECT * FROM menuitems`,
+router.post('/menu-items', (req, res, next) => {
+  db.query(`SELECT * FROM menuitems WHERE owner = ${db.escape(req.body.id)}`,
     (err, result) => {
       // user does not exists
       if (err) {
@@ -135,7 +135,6 @@ router.get('/menu-items', (req, res, next) => {
 });
 
 router.put('/edit-item', (req, res, next) => {
-  console.log(req.body.name)
   db.query(
     `UPDATE 
       menuitems 
@@ -180,17 +179,17 @@ router.delete('/delete-item', (req, res, next) => {
 });
 
 router.post('/add-item', (req, res, next) => {
-  console.log(req.body.data.data.name)
   db.query(
     `INSERT INTO 
-      menuitems (name, ingredients, category, glutenFree, lactoseFree, price)
+      menuitems (name, ingredients, category, glutenFree, lactoseFree, price, owner)
     VALUES
      (${db.escape(req.body.data.data.name)},
       ${db.escape(req.body.data.data.ingredients)},
       ${db.escape(req.body.data.data.category)},
       ${db.escape(req.body.data.data.glutenFree)},
       ${db.escape(req.body.data.data.lactoseFree)},
-      ${db.escape(req.body.data.data.price)})`, function(err, result) {
+      ${db.escape(req.body.data.data.price)},
+      ${db.escape(req.body.data.data.owner)})`, function(err, result) {
 
       if( err ) {
         return res.status(500).send({
@@ -206,8 +205,8 @@ router.post('/add-item', (req, res, next) => {
     })
 });
 
-router.get('/restaurant-info', (req, res, next) => {
-  db.query(`SELECT * FROM restaurant_info WHERE id = 1`,
+router.post('/restaurant-info', (req, res, next) => {
+  db.query(`SELECT * FROM restaurants WHERE owner = ${String(db.escape(req.body.id))}`,
     (err, result) => {
       // user does not exists
       if (err) {
@@ -227,7 +226,6 @@ router.get('/restaurant-info', (req, res, next) => {
 });
 
 router.put('/edit-about', (req, res, next) => {
-  console.log(req.body.openHours)
   db.query(
     `UPDATE 
       restaurant_info
