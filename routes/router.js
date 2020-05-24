@@ -46,7 +46,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                     }
 
                     db.query(
-                      `INSERT INTO restaurants (owner) VALUES ('${uuidv}')`)
+                      `INSERT INTO restaurants (route_name, owner) VALUES (${db.escape(req.body.routeName)},'${uuidv}')`)
 
                     return res.status(201).send({
                       msg: 'Konto skapat!'
