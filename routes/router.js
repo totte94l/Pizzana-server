@@ -47,7 +47,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
 
                     db.query(
                       `INSERT INTO restaurants (route_name, owner) VALUES (${db.escape(req.body.routeName)},'${uuidv}')`)
-
+                       console.log(req.body.routeName)
                     return res.status(201).send({
                       msg: 'Konto skapat!'
                     });
@@ -235,6 +235,7 @@ router.delete('/delete-item', (req, res, next) => {
 });
 
 router.post('/add-item', (req, res, next) => {
+  console.log(req.body.data.data.name)
   db.query(
     `INSERT INTO 
       menuitems (name, ingredients, category, glutenFree, lactoseFree, price, owner)
@@ -248,6 +249,7 @@ router.post('/add-item', (req, res, next) => {
       ${db.escape(req.body.data.data.owner)})`, function(err, result) {
 
       if( err ) {
+        console.log(err)
         return res.status(500).send({
           success: 'false',
           msg: 'Fel! Kunde inte lägga till rätt'
@@ -310,7 +312,11 @@ router.put('/edit-about', (req, res, next) => {
 
 router.post('/public-menu', (req, res, next) => {
   console.log(req.body.routeName)
-  db.query(`SELECT owner FROM restaurants WHERE route_name = ${db.escape(req.body.routeName)}`,
+  const routeName = req.body.routeName
+
+  if( !routeName == '' || !routeName == undefined ) {
+    console.log("körs?")
+    db.query(`SELECT owner FROM restaurants WHERE route_name = ${db.escape(req.body.routeName)}`,
     (err, result) => {
       // user does not exists
       if (err) {
@@ -318,25 +324,31 @@ router.post('/public-menu', (req, res, next) => {
         return res.status(400).send({
           msg: err
         });
-      } else {
+      } else if(result.length < 1) {
+        return res.status(500).send({
+          msg: 'Kunde inte hitta owner'
+        });
+      } 
+      else {
         console.log(result[0].owner);
-        db.query(`
-          SELECT
-          *
-          FROM 
-            menuitems
-          WHERE
-            owner = ${result[0].owner} `,
-
+        db.query(`SELECT * FROM menuitems HAVING owner = '${result[0].owner}' `,
           (err, result) => {
+            if(err) {
+              console.log(err)
+            }
           return res.status(200).send({
-            msg: err,
+            msg: 'Fick menyn',
             menu: result
           });
         })
       }
     }
   );
+  } else {
+    return res.status(500).send({
+      msg: 'Incorrect Route'
+    });
+  }
 });
 
 module.exports = router;
