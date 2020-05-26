@@ -264,9 +264,11 @@ router.post('/add-item', (req, res, next) => {
 });
 
 router.post('/restaurant-info', (req, res, next) => {
-  db.query(`SELECT * FROM restaurants WHERE owner = ${String(db.escape(req.body.id))}`,
+  console.log(req.body.id)
+  db.query(`SELECT * FROM restaurants WHERE owner = ${db.escape(req.body.id)};`,
     (err, result) => {
       // user does not exists
+      console.log(result)
       if (err) {
         throw err;
         return res.status(400).send({
