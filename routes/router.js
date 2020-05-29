@@ -264,11 +264,11 @@ router.post('/add-item', (req, res, next) => {
 });
 
 router.post('/restaurant-info', (req, res, next) => {
-  console.log(req.body.id)
+  console.log("id: ", req.body)
   db.query(`SELECT * FROM restaurants WHERE owner = ${db.escape(req.body.id)};`,
     (err, result) => {
       // user does not exists
-      console.log(result)
+      console.log("result: " + result)
       if (err) {
         throw err;
         return res.status(400).send({
@@ -353,4 +353,24 @@ router.post('/public-menu', (req, res, next) => {
   }
 });
 
+router.post('/public-restaurant', (req, res, next) => {
+  db.query(`SELECT * FROM restaurants WHERE route_name = ${db.escape(req.body.routeName)};`,
+    (err, result) => {
+      // user does not exists
+      console.log("result: ", result)
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          msg: err
+        });
+      }
+      else {
+        return res.status(200).send({
+          msg: 'success',
+          info: result
+        });
+      }
+    }
+  );
+});
 module.exports = router;
